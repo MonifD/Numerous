@@ -1,0 +1,24 @@
+{
+  "name": "numerous",
+  "version": "1.0.0",
+  "description": "Jeu multijoueur Numerous",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "game",
+    "multiplayer",
+    "socket.io",
+    "express",
+    "nodejs"
+  ],
+  "author": "VotreNom",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.1",
+    "socket.io": "^4.6.1"
+  }
+}
