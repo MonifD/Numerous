@@ -1,9 +1,9 @@
-const express = require('express'); 
-const http = require('http'); 
+const express = require('express');
+const http = require('http');
 const { Server } = require('socket.io');
 
-const app = express(); 
-const server = http.createServer(app); 
+const app = express();
+const server = http.createServer(app);
 const io = new Server(server);
 
 app.use(express.static('public'));
@@ -25,12 +25,13 @@ io.on('connection', (socket) => {
 
         parties[partyId] = {
             players: [socket.id],
-            mysteryNumber: mysteryNumber
+            mysteryNumber: mysteryNumber,
+            gameStarted: false
         };
 
         socket.join(partyId);
         console.log(`Partie créée : ${partyId} avec le nombre mystère ${mysteryNumber}`);
-        socket.emit('partyCreated', { partyId, mysteryNumber });
+        socket.emit('partyCreated', { partyId });
     });
 
     // Rejoindre une partie existante
@@ -42,7 +43,53 @@ io.on('connection', (socket) => {
             socket.emit('partyJoined', { partyId });
             io.to(partyId).emit('updatePlayers', parties[partyId].players);
         } else {
-            socket.emit('error', 'Partie introuvable');
+            socket.emit('error', 'Partie introuvable.');
+        }
+    });
+
+    // Lancer la partie
+    socket.on('startGame', (partyId) => {
+        const party = parties[partyId];
+        if (party) {
+            if (party.players[0] === socket.id) { // Vérifie si c'est l'hôte
+                party.gameStarted = true;
+                io.to(partyId).emit('gameStarted', {
+                    message: "La partie a commencé ! Devinez le nombre mystère (6 chiffres)."
+                });
+                console.log(`Partie ${partyId} lancée avec le nombre mystère ${party.mysteryNumber}`);
+            } else {
+                socket.emit('error', "Seul l'hôte peut lancer la partie.");
+            }
+        } else {
+            socket.emit('error', 'Partie introuvable.');
+        }
+    });
+
+    // Traiter une proposition de chiffre
+    socket.on('guessNumber', ({ partyId, guess }) => {
+        const party = parties[partyId];
+        if (party && party.gameStarted) {
+            const difference = Math.abs(party.mysteryNumber - guess);
+            let hint = '';
+
+            if (difference === 0) {
+                hint = '🎉 Exact !';
+                io.to(partyId).emit('gameOver', {
+                    winner: socket.id,
+                    number: party.mysteryNumber
+                });
+                delete parties[partyId]; // Terminer la partie
+            } else if (difference <= 10) {
+                hint = '🔥 Très proche !';
+            } else if (difference <= 100) {
+                hint = '🌟 Proche.';
+            } else {
+                hint = '❄️ Loin.';
+            }
+
+            socket.emit('guessResponse', { hint });
+        } else {
+            socket.emit('error', "La partie n'a pas encore commencé ou est introuvable.");
         }
     });
 
@@ -72,7 +119,6 @@ function generatePartyId() {
 function generateMysteryNumber() {
     return Math.floor(100000 + Math.random() * 900000);
 }
-
 
 server.listen(3000, () => {
     console.log('Serveur en cours d\'exécution sur http://localhost:3000');

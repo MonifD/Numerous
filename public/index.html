@@ -3,13 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Numerous</title>
+    <title>Numerous - Jeu multijoueur</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <h1>Bienvenue sur Numerous</h1>
+
+    <!-- Gestion des parties -->
     <button id="createParty">Créer une partie</button>
     <button id="joinParty">Rejoindre une partie</button>
     <input type="text" id="partyIdInput" placeholder="ID de la partie">
+
+    <!-- Gestion du jeu -->
+    <button id="startGame">Lancer la partie</button>
+    <input type="number" id="guessInput" placeholder="Entrez votre nombre">
+    <button id="submitGuess">Envoyer</button>
+
+    <!-- Statut -->
     <p id="status"></p>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -20,6 +55,11 @@
         const createPartyBtn = document.getElementById('createParty');
         const joinPartyBtn = document.getElementById('joinParty');
         const partyIdInput = document.getElementById('partyIdInput');
+        const startGameBtn = document.getElementById('startGame');
+        const guessInput = document.getElementById('guessInput');
+        const submitGuessBtn = document.getElementById('submitGuess');
+
+        let currentPartyId = null;
 
         // Créer une partie
         createPartyBtn.addEventListener('click', () => {
@@ -28,25 +68,58 @@
 
         // Rejoindre une partie
         joinPartyBtn.addEventListener('click', () => {
-            const partyId = partyIdInput.value;
+            const partyId = partyIdInput.value.trim();
             if (partyId) {
                 socket.emit('joinParty', partyId);
             } else {
-                status.textContent = 'Veuillez entrer un ID de partie';
+                status.textContent = 'Veuillez entrer un ID de partie.';
             }
         });
 
-        // Événements serveur
+        // Lancer la partie
+        startGameBtn.addEventListener('click', () => {
+            if (currentPartyId) {
+                socket.emit('startGame', currentPartyId);
+            } else {
+                status.textContent = 'Vous n\'êtes pas dans une partie.';
+            }
+        });
+
+        // Envoyer une proposition
+        submitGuessBtn.addEventListener('click', () => {
+            const guess = parseInt(guessInput.value);
+            if (currentPartyId && !isNaN(guess)) {
+                socket.emit('guessNumber', { partyId: currentPartyId, guess });
+            } else {
+                status.textContent = "Entrez un nombre valide.";
+            }
+        });
+
+        // Réponses serveur mises à jour
         socket.on('partyCreated', (data) => {
-            status.textContent = `Partie créée avec l'ID : ${data.partyId}`;
+            currentPartyId = data.partyId;
+            status.textContent = `Partie créée avec succès ! ID : ${currentPartyId}`;
         });
 
         socket.on('partyJoined', (data) => {
-            status.textContent = `Rejoint la partie : ${data.partyId}`;
+            currentPartyId = data.partyId;
+            status.textContent = `Vous avez rejoint la partie : ${currentPartyId}`;
         });
 
         socket.on('updatePlayers', (players) => {
             status.textContent = `Joueurs dans la partie : ${players.length}`;
+        });
+
+        socket.on('gameStarted', (data) => {
+            status.textContent = data.message;
+        });
+
+        socket.on('guessResponse', (data) => {
+            status.textContent = `Indice : ${data.hint}`;
+        });
+
+        socket.on('gameOver', (data) => {
+            status.textContent = `Jeu terminé ! Le gagnant est ${data.winner}. Le nombre mystère était ${data.number}.`;
         });
 
         socket.on('error', (message) => {
