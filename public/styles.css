@@ -1,0 +1,26 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 20px;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+input {
+    padding: 10px;
+    margin: 10px;
+}
+
+.leaderboard-title {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+#leaderboard {
+    list-style-type: none;
+    padding: 0;
+}
