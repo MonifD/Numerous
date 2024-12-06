@@ -17,10 +17,6 @@ Jeu multijoueur où les joueurs doivent deviner un nombre mystère.
    ```bash
    npm install
    ```
-3. Configurer l'environnement :
-   - Copier `.env.example` dans `.env`.
-   - Ajouter l'URL MongoDB.
-
 ## Lancer le projet
 1. Démarrer le backend :
    ```bash
@@ -32,3 +28,5 @@ Jeu multijoueur où les joueurs doivent deviner un nombre mystère.
 - Créer une partie via l'API `/api/games/create`.
 - Rejoindre une partie avec l'ID généré.
 - Soumettre des nombres et visualiser les scores.
+
+ajout des explication pas besoin d'un .env, ni de mongodb, j'ai essayer d'afficher le leaderbord et le score avec mongo, sauf que j' nai pas réussi donc j'ai du revenir a l'ancien code, mais pas supprimer, les codes de la configuration et models, ils snot présent mais pas utiliser.

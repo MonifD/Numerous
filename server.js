@@ -123,3 +123,5 @@ function generateMysteryNumber() {
 server.listen(3000, () => {
     console.log('Serveur en cours d\'exécution sur http://localhost:3000');
 });
+
+
