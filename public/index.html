@@ -7,10 +7,51 @@
 </head>
 <body>
     <h1>Bienvenue sur Numerous</h1>
+    <button id="createParty">Créer une partie</button>
+    <button id="joinParty">Rejoindre une partie</button>
+    <input type="text" id="partyIdInput" placeholder="ID de la partie">
+    <p id="status"></p>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        console.log('Connecté au serveur');
+
+        const status = document.getElementById('status');
+        const createPartyBtn = document.getElementById('createParty');
+        const joinPartyBtn = document.getElementById('joinParty');
+        const partyIdInput = document.getElementById('partyIdInput');
+
+        // Créer une partie
+        createPartyBtn.addEventListener('click', () => {
+            socket.emit('createParty');
+        });
+
+        // Rejoindre une partie
+        joinPartyBtn.addEventListener('click', () => {
+            const partyId = partyIdInput.value;
+            if (partyId) {
+                socket.emit('joinParty', partyId);
+            } else {
+                status.textContent = 'Veuillez entrer un ID de partie';
+            }
+        });
+
+        // Événements serveur
+        socket.on('partyCreated', (data) => {
+            status.textContent = `Partie créée avec l'ID : ${data.partyId}`;
+        });
+
+        socket.on('partyJoined', (data) => {
+            status.textContent = `Rejoint la partie : ${data.partyId}`;
+        });
+
+        socket.on('updatePlayers', (players) => {
+            status.textContent = `Joueurs dans la partie : ${players.length}`;
+        });
+
+        socket.on('error', (message) => {
+            status.textContent = `Erreur : ${message}`;
+        });
     </script>
 </body>
 </html>

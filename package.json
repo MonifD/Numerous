@@ -1,24 +1,27 @@
 {
-  "name": "numerous",
-  "version": "1.0.0",
-  "description": "Jeu multijoueur Numerous",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "keywords": [
-    "game",
-    "multiplayer",
-    "socket.io",
-    "express",
-    "nodejs"
-  ],
-  "author": "VotreNom",
-  "license": "MIT",
-  "dependencies": {
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "mongoose": "^7.0.1",
-    "socket.io": "^4.6.1"
+    "name": "numerous",
+    "version": "1.0.0",
+    "description": "Numerous - Jeu multijoueur avec Express et Socket.io",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js",
+      "dev": "nodemon server.js"
+    },
+    "keywords": [
+      "numerous",
+      "jeu",
+      "multijoueur",
+      "socket.io",
+      "express"
+    ],
+    "author": "Ton Nom",
+    "license": "MIT",
+    "dependencies": {
+      "express": "^4.18.2",
+      "socket.io": "^4.6.1"
+    },
+    "devDependencies": {
+      "nodemon": "^3.0.1"
+    }
   }
-}
+  
